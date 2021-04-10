@@ -36,7 +36,7 @@ class DeepQNetwork:
         input_layer = tf.keras.layers.Dense(256, activation=tf.keras.activations.elu)(one)
         second_layer = tf.keras.layers.Dense(512, activation='elu')(input_layer)
         middle_layer = tf.keras.layers.Dense(256, activation=tf.keras.activations.elu)(second_layer)
-        last_layer = tf.keras.layers.Dense(self.num_action_space, activation='tanh')(middle_layer)
+        last_layer = tf.keras.layers.Dense(self.num_action_space, activation='linear')(middle_layer)
         model = tf.keras.Model(inputs=[one], outputs=[last_layer])
         model.compile(tf.keras.optimizers.Adam(lr=self.lr),loss=tf.keras.losses.mean_squared_logarithmic_error)
         return model
@@ -45,7 +45,7 @@ class DeepQNetwork:
         # Epsilon Greedy policy
         if np.random.rand() > self.epsilon:
             print(f"Action received from the model is: {self.model.predict(state)[0]}")
-            return self.model.predict(state)[0]
+            return np.clip(self.model.predict(state)[0], -1, 1)
 
 
         else:
